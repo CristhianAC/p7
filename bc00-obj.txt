@@ -1,0 +1,11 @@
+#reglas
+q:-p.
+p:-l,m.
+m:-b,l.
+q:-a,p.
+l:-a,b.
+#hechos
+a.
+b.
+#objetivo (* si no hay)
+p
