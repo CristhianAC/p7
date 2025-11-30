@@ -76,8 +76,46 @@ public class Inferencia {
    *         objetivo)
    */
   public boolean encDelante() {
+    // Si hay un objetivo definido y ya forma parte de los hechos conocidos, retornamos true
+    if (!ob.equals("*") && conoFinal.contains(ob)) {
+      return true;
+    }
 
-    // TODO
+    boolean nuevoHecho = true;
+    while (nuevoHecho) {
+      nuevoHecho = false;
+      // Iteramos sobre todas las reglas de la base de conocimiento
+      for (ClausHorn regla : BC.getBaseReglas()) {
+        String consecuente = regla.getConsecuente();
+
+        // Si el consecuente ya es conocido, no necesitamos volver a inferirlo
+        if (conoFinal.contains(consecuente)) {
+          continue;
+        }
+
+        // Comprobamos si todas las premisas de la regla se cumplen con el conocimiento actual
+        boolean premisasCumplidas = true;
+        for (String premisa : regla.getPremisas()) {
+          if (!conoFinal.contains(premisa)) {
+            premisasCumplidas = false;
+            break;
+          }
+        }
+
+        // Si todas las premisas se cumplen, inferimos el consecuente (Modus Ponens)
+        if (premisasCumplidas) {
+          conoFinal.add(consecuente);
+          nuevoHecho = true; // Marcamos que hubo un cambio para seguir iterando
+
+          // Si el nuevo hecho es el objetivo, terminamos con éxito
+          if (!ob.equals("*") && consecuente.equals(ob)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    // Si el bucle termina sin encontrar el objetivo, devolvemos false
     return false;
   }
 
