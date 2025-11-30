@@ -127,22 +127,27 @@ public class Inferencia {
    * @return cierto si el objetivo es consecuencia de la base de conocimiento
    */
   public boolean encAtras() {
+    // Si no hay objetivo definido, no se puede encadenar hacia atrás
+    if (ob == null || ob.equals("*")) {
+      return false;
+    }
+
     // Verificar si ya conocemos el objetivo como un hecho
     if (conoFinal.contains(ob)) {
       return true;
     }
 
-    // Obtener las reglas de la base de conocimiento
-    Set<Regla> reglas = BC.getReglas();
+    // Obtener las reglas de la base de conocimiento (Clausulas de Horn)
+    Set<ClausHorn> reglas = BC.getBaseReglas();
 
     // Iterar sobre las reglas para buscar si alguna puede derivar el objetivo
-    for (Regla regla : reglas) {
-      // Si la conclusión de la regla es el objetivo
-      if (regla.getConclusion().equals(ob)) {
+    for (ClausHorn regla : reglas) {
+      // Si el consecuente de la regla es el objetivo
+      if (regla.getConsecuente().equals(ob)) {
         boolean todosLosAntecedentesCumplidos = true;
 
-        // Verificar si todos los antecedentes de la regla se cumplen
-        for (String antecedente : regla.getAntecedentes()) {
+        // Verificar si todas las premisas de la regla se cumplen (recursivamente)
+        for (String antecedente : regla.getPremisas()) {
           Inferencia subInferencia = new Inferencia(BC, antecedente);
           if (!subInferencia.encAtras()) {
             todosLosAntecedentesCumplidos = false;
